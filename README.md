@@ -261,4 +261,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 © 2025 Reabot6. All rights reserved.
 
-[Website](https://insightai.app) • [Twitter](https://twitter.com/insightai) • [Discord](https://discord.gg/insightai)
+[Website](https://insightai.vercel.app) • [x](https://X.com/reabot6) • [linkedin](https://www.linkedin.com/in/onimisi-adeiza-bb2035254/)
