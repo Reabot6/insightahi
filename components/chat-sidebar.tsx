@@ -247,7 +247,7 @@ export default function Sidebar({
             onClick={() => router.push('/')}
             title="Back to Home"
           >
-            <Home className="w-5 h-5" />
+            <Hom className="w-5 h-5" />
           </Button>
         </div>
       </div>
