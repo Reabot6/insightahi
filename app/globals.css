@@ -1,0 +1,264 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Production-grade dark theme optimized for slate-950 background */
+:root {
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.15 0.01 264);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 264);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 264);
+  --primary: oklch(0.52 0.19 264);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.94 0.008 264);
+  --secondary-foreground: oklch(0.15 0.01 264);
+  --muted: oklch(0.96 0.005 264);
+  --muted-foreground: oklch(0.48 0.015 264);
+  --accent: oklch(0.90 0.015 264);
+  --accent-foreground: oklch(0.15 0.01 264);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.90 0.008 264);
+  --input: oklch(0.90 0.008 264);
+  --ring: oklch(0.52 0.19 264);
+  --chart-1: oklch(0.55 0.20 264);
+  --chart-2: oklch(0.60 0.18 190);
+  --chart-3: oklch(0.65 0.16 85);
+  --chart-4: oklch(0.50 0.22 310);
+  --chart-5: oklch(0.58 0.19 25);
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* Slate-950 optimized theme */
+  --background: 9 9 11; /* slate-950 */
+  --foreground: 248 250 252; /* slate-50 */
+  --card: 15 23 42; /* slate-900 */
+  --card-foreground: 248 250 252;
+  --popover: 15 23 42;
+  --popover-foreground: 248 250 252;
+  --primary: 99 102 241; /* indigo-500 */
+  --primary-foreground: 248 250 252;
+  --secondary: 30 41 59; /* slate-800 */
+  --secondary-foreground: 248 250 252;
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184; /* slate-400 */
+  --accent: 51 65 85; /* slate-700 */
+  --accent-foreground: 248 250 252;
+  --destructive: 239 68 68; /* red-500 */
+  --destructive-foreground: 248 250 252;
+  --border: 51 65 85; /* slate-700 */
+  --input: 51 65 85;
+  --ring: 99 102 241;
+  --chart-1: 99 102 241;
+  --chart-2: 168 85 247; /* purple-500 */
+  --chart-3: 59 130 246; /* blue-500 */
+  --chart-4: 236 72 153; /* pink-500 */
+  --chart-5: 251 146 60; /* orange-400 */
+}
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-slate-950 text-slate-50 antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    font-optical-sizing: auto;
+  }
+  
+  /* Enhanced markdown prose with better readability */
+  .prose {
+    @apply text-slate-200 max-w-none;
+  }
+  
+  .prose code {
+    @apply text-sm font-mono bg-slate-800/60 text-pink-400 px-2 py-0.5 rounded-md border border-slate-700;
+  }
+  
+  .prose pre {
+    @apply my-4 overflow-x-auto rounded-xl bg-slate-900/50 border border-slate-700 p-0 shadow-lg;
+  }
+  
+  .prose pre code {
+    @apply bg-transparent p-0 text-sm leading-relaxed border-0 text-slate-300;
+  }
+  
+  .prose p {
+    @apply leading-7 my-3 text-slate-200;
+  }
+  
+  .prose ul, .prose ol {
+    @apply my-3 ml-6 space-y-1.5;
+  }
+  
+  .prose ul {
+    @apply list-disc;
+  }
+  
+  .prose ol {
+    @apply list-decimal;
+  }
+  
+  .prose li {
+    @apply leading-7 text-slate-200;
+  }
+  
+  .prose li::marker {
+    @apply text-slate-500;
+  }
+  
+  .prose strong {
+    @apply font-semibold text-white;
+  }
+  
+  .prose a {
+    @apply text-blue-400 underline underline-offset-4 hover:text-blue-300 transition-colors;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-blue-500/30 pl-6 italic my-4 text-slate-400;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply font-semibold tracking-tight text-white;
+  }
+  
+  .prose h1 {
+    @apply text-3xl mt-6 mb-4;
+  }
+  
+  .prose h2 {
+    @apply text-2xl mt-6 mb-3;
+  }
+  
+  .prose h3 {
+    @apply text-xl mt-5 mb-3;
+  }
+  
+  .prose h4 {
+    @apply text-lg mt-4 mb-2;
+  }
+  
+  .prose hr {
+    @apply my-8 border-slate-700;
+  }
+  
+  .prose table {
+    @apply w-full my-4 border-collapse;
+  }
+  
+  .prose th {
+    @apply bg-slate-800 px-4 py-2 text-left font-semibold border border-slate-700;
+  }
+  
+  .prose td {
+    @apply px-4 py-2 border border-slate-700;
+  }
+  
+  /* Custom scrollbar with modern slate theme */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgb(51 65 85 / 0.6);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(51 65 85 / 0.9);
+    background-clip: padding-box;
+  }
+  
+  /* Smooth animations and transitions */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%
+    );
+    background-size: 1000px 100%;
+  }
+  
+  /* Focus states for accessibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-none ring-2 ring-blue-500/50 ring-offset-2 ring-offset-slate-950;
+  }
+  
+  /* Disable number input spinners for cleaner look */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  /* Selection color */
+  ::selection {
+    background-color: rgb(99 102 241 / 0.3);
+    color: rgb(248 250 252);
+  }
+}
