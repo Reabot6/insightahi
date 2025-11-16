@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Code2, GraduationCap, Sparkles, FileText, ImageIcon, Link2, ArrowRight, Zap, Shield, Clock } from 'lucide-react'
+import { Code2, GraduationCap, Sparkles, FileText, Image as ImageIcon, Link2, ArrowRight, Zap, Shield, Clock, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import ChatInterface from '@/components/chat-interface'
+import { cn } from '@/lib/utils'
 
 type Mode = 'dev' | 'user'
 
@@ -16,210 +17,273 @@ export default function Home() {
   }
 
   if (selectedMode && !showChat) {
-    return selectedMode === 'dev' ? <DevModeLanding onStart={() => setShowChat(true)} onBack={() => setSelectedMode(null)} /> : <UserModeLanding onStart={() => setShowChat(true)} onBack={() => setSelectedMode(null)} />
+    return selectedMode === 'dev' 
+      ? <DevModeLanding onStart={() => setShowChat(true)} onBack={() => setSelectedMode(null)} /> 
+      : <UserModeLanding onStart={() => setShowChat(true)} onBack={() => setSelectedMode(null)} />
   }
 
+  return <LandingPage onSelectMode={setSelectedMode} />
+}
+
+function LandingPage({ onSelectMode }: { onSelectMode: (mode: Mode) => void }) {
   return (
-    <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 animate-pulse" style={{ animationDuration: '8s' }}></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(99,102,241,0.1),rgba(168,85,247,0.05),transparent)]"></div>
-      
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="flex justify-center mb-8">
-            <div className="relative w-20 h-20 group">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl opacity-20 blur-2xl group-hover:opacity-30 transition-opacity"></div>
-              <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-blue-500/30 group-hover:scale-105 transition-transform">
-                <span className="text-white font-bold text-4xl">I</span>
+    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+      {/* Animated Orbital Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full 
+                        bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 
+                        animate-spin-slow blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full 
+                        bg-gradient-to-r from-blue-500/20 to-transparent 
+                        animate-spin-reverse blur-2xl"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-6 py-16 md:py-24">
+        <header className="text-center space-y-6 max-w-3xl mx-auto">
+          <div className="flex justify-center">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-3xl blur-xl opacity-50 
+                              group-hover:opacity-70 transition-opacity duration-500"></div>
+              <div className="relative p-4 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 backdrop-blur-xl 
+                              rounded-3xl border border-white/10 shadow-2xl">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-600 
+                                flex items-center justify-center shadow-lg">
+                  <span className="text-3xl font-black tracking-tighter">I</span>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium mb-4 border border-blue-500/20">
-            <Sparkles className="w-4 h-4" />
-            Turn Docs & PDFs into Instant Answers
+
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 
+                          backdrop-blur-md text-sm font-medium">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span>AI that reads, thinks, and teaches</span>
           </div>
-          
-          <h1 className="text-6xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               InsightAI
             </span>
           </h1>
-          
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Paste URLs, upload PDFs, or scan images — let AI tutor, summarize, and explain everything for you.
+
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            Upload PDFs, paste docs, scan images — get <span className="text-cyan-400">instant answers</span>, summaries, and interactive tutoring.
           </p>
+        </header>
 
-          <div className="grid md:grid-cols-2 gap-6 mt-16">
-            <button
-              onClick={() => setSelectedMode('dev')}
-              className="group relative p-8 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-blue-500/50 transition-all text-left overflow-hidden backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
-                  <Code2 className="w-7 h-7 text-blue-400" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-white">For Developers</h3>
-                <p className="text-slate-400 mb-6">
-                  Understand documentation faster. Get instant insights from any technical docs, APIs, or frameworks.
-                </p>
-                <div className="flex items-center text-blue-400 font-medium">
-                  Start building <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </button>
+        {/* Mode Selector – Hero Cards */}
+        <div className="mt-20 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <ModeCard
+            mode="dev"
+            icon={<Code2 className="w-9 h-9" />}
+            title="Developer Mode"
+            description="Master any API, framework, or doc in minutes."
+            features={['URL → Code', 'PDF → Examples', 'Diagram → Explanation']}
+            gradient="from-cyan-500 to-blue-600"
+            onClick={() => onSelectMode('dev')}
+          />
 
-            <button
-              onClick={() => setSelectedMode('user')}
-              className="group relative p-8 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-purple-500/50 transition-all text-left overflow-hidden backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
-                  <GraduationCap className="w-7 h-7 text-purple-400" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-white">For Learning</h3>
-                <p className="text-slate-400 mb-6">
-                  Study smarter with AI. Upload study materials and get summaries, quizzes, and explanations.
-                </p>
-                <div className="flex items-center text-purple-400 font-medium">
-                  Start learning <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </button>
-          </div>
+          <ModeCard
+            mode="user"
+            icon={<GraduationCap className="w-9 h-9" />}
+            title="Learning Mode"
+            description="Your AI tutor for notes, papers, and exams."
+            features={['PDF → Summary', 'Quiz Generator', 'Ask Anything']}
+            gradient="from-purple-500 to-pink-600"
+            onClick={() => onSelectMode('user')}
+          />
+        </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-16 text-sm">
-            <div className="flex items-center justify-center gap-2 text-slate-400 hover:text-slate-300 transition-colors">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              Instant Processing
-            </div>
-            <div className="flex items-center justify-center gap-2 text-slate-400 hover:text-slate-300 transition-colors">
-              <Shield className="w-4 h-4 text-green-400" />
-              Privacy-First
-            </div>
-            <div className="flex items-center justify-center gap-2 text-slate-400 hover:text-slate-300 transition-colors">
-              <Clock className="w-4 h-4 text-blue-400" />
-              No Sign-Up
-            </div>
-          </div>
+        {/* Trust Bar */}
+        <div className="mt-20 flex flex-wrap justify-center gap-8 text-sm text-gray-500">
+          <TrustItem icon={<Zap className="w-4 h-4 text-yellow-400" />} label="Real-time" />
+          <TrustItem icon={<Shield className="w-4 h-4 text-green-400" />} label="Private" />
+          <TrustItem icon={<Clock className="w-4 h-4 text-blue-400" />} label="No login" />
         </div>
       </div>
-      
-      <div className="absolute bottom-8 left-0 right-0 text-center text-slate-500 text-sm">
-        <p>© 2025 Reabot6 • Built with ❤️ • Powered by AI</p>
-      </div>
+
+      <footer className="absolute bottom-6 left-0 right-0 text-center text-gray-600 text-xs">
+        © 2025 <span className="text-cyan-400">@Reabot6</span> • Built with vision • Powered by curiosity
+      </footer>
     </div>
   )
 }
 
+function ModeCard({
+  icon,
+  title,
+  description,
+  features,
+  gradient,
+  onClick
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  features: string[]
+  gradient: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "group relative p-8 rounded-3xl overflow-hidden",
+        "bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-xl",
+        "border border-white/10",
+        "hover:border-white/30 transition-all duration-300",
+        "hover:scale-[1.02] active:scale-[0.99]",
+        "text-left shadow-2xl"
+      )}
+    >
+      {/* Gradient Overlay on Hover */}
+      <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                         `bg-gradient-to-br ${gradient} blur-3xl`)}></div>
+
+      <div className="relative z-10 space-y-6">
+        <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center",
+                           `bg-gradient-to-br ${gradient} shadow-lg`)}>
+          {icon}
+        </div>
+
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
+          <p className="text-gray-400">{description}</p>
+        </div>
+
+        <ul className="space-y-2">
+          {features.map((f, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+              <div className="w-1 h-1 rounded-full bg-current"></div>
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex items-center text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform">
+          Enter mode <ArrowRight className="w-4 h-4 ml-2" />
+        </div>
+      </div>
+    </button>
+  )
+}
+
+function TrustItem({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-2 hover:text-gray-300 transition-colors">
+      {icon}
+      <span>{label}</span>
+    </div>
+  )
+}
+
+// Dev Mode Landing
 function DevModeLanding({ onStart, onBack }: { onStart: () => void; onBack: () => void }) {
-  return (
-    <div className="min-h-screen bg-slate-950">
-      <div className="container mx-auto px-4 py-12">
-        <Button variant="ghost" onClick={onBack} className="mb-8 hover:bg-slate-800">
-          ← Back
-        </Button>
-        
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-              <Code2 className="w-8 h-8 text-blue-400" />
-            </div>
-            <h1 className="text-5xl font-bold text-white">Developer Mode</h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Skip hours of reading docs. Get instant answers, code examples, and implementation guides.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-blue-500/50 transition-all backdrop-blur-sm">
-              <Link2 className="w-8 h-8 text-blue-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Paste Doc URLs</h3>
-              <p className="text-sm text-slate-400">
-                AI reads any documentation link and gives you instant insights
-              </p>
-            </div>
-            
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-blue-500/50 transition-all backdrop-blur-sm">
-              <FileText className="w-8 h-8 text-blue-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Upload PDFs</h3>
-              <p className="text-sm text-slate-400">
-                Drag & drop PDF docs for summaries and code examples
-              </p>
-            </div>
-            
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-blue-500/50 transition-all backdrop-blur-sm">
-              <ImageIcon className="w-8 h-8 text-blue-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Scan Images</h3>
-              <p className="text-sm text-slate-400">
-                Screenshots or diagrams — AI will read and explain them
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center pt-8">
-            <Button size="lg" onClick={onStart} className="h-14 px-8 text-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/30 transition-all hover:scale-105">
-              <Sparkles className="w-5 h-5 mr-2" />
-              Start Exploring Docs
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  return <ModeLandingTemplate
+    mode="dev"
+    icon={<Code2 className="w-10 h-10" />}
+    title="Developer Mode"
+    subtitle="Stop reading. Start building."
+    gradient="from-cyan-500 to-blue-600"
+    features={[
+      { icon: <Link2 />, title: "Paste any doc URL", desc: "AI extracts structure, APIs, examples" },
+      { icon: <FileText />, title: "Drop PDF docs", desc: "Get code snippets, architecture, gotchas" },
+      { icon: <ImageIcon />, title: "Upload diagrams", desc: "Flowcharts → explanations → code" }
+    ]}
+    cta="Start Exploring Docs"
+    onStart={onStart}
+    onBack={onBack}
+  />
 }
 
+// User Mode Landing
 function UserModeLanding({ onStart, onBack }: { onStart: () => void; onBack: () => void }) {
+  return <ModeLandingTemplate
+    mode="user"
+    icon={<GraduationCap className="w-10 h-10" />}
+    title="Learning Mode"
+    subtitle="Study smarter, not harder."
+    gradient="from-purple-500 to-pink-600"
+    features={[
+      { icon: <FileText />, title: "Upload notes & PDFs", desc: "Instant summaries + key concepts" },
+      { icon: <Sparkles />, title: "Auto-quizzes & flashcards", desc: "Active recall built-in" },
+      { icon: <GraduationCap />, title: "Ask anything", desc: "Step-by-step explanations" }
+    ]}
+    cta="Start Learning"
+    onStart={onStart}
+    onBack={onBack}
+  />
+}
+
+function ModeLandingTemplate({
+  icon,
+  title,
+  subtitle,
+  gradient,
+  features,
+  cta,
+  onStart,
+  onBack
+}: {
+  icon: React.ReactNode
+  title: string
+  subtitle: string
+  gradient: string
+  features: { icon: React.ReactNode; title: string; desc: string }[]
+  cta: string
+  onStart: () => void
+  onBack: () => void
+}) {
   return (
-    <div className="min-h-screen bg-slate-950">
-      <div className="container mx-auto px-4 py-12">
-        <Button variant="ghost" onClick={onBack} className="mb-8 hover:bg-slate-800">
-          ← Back
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-6 py-12">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="mb-10 text-gray-400 hover:text-white hover:bg-white/10"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" /> Back
         </Button>
-        
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4 border border-purple-500/20">
-              <GraduationCap className="w-8 h-8 text-purple-400" />
+
+        <div className="max-w-4xl mx-auto space-y-16">
+          <header className="text-center space-y-6">
+            <div className={cn("w-20 h-20 rounded-3xl mx-auto flex items-center justify-center",
+                               `bg-gradient-to-br ${gradient} shadow-xl`)}>
+              {icon}
             </div>
-            <h1 className="text-5xl font-bold text-white">Learning Mode</h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Your personal AI tutor. Upload study materials and get summaries, quizzes, flashcards, and step-by-step explanations.
-            </p>
-          </div>
+            <h1 className="text-5xl md:text-6xl font-black">{title}</h1>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">{subtitle}</p>
+          </header>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-purple-500/50 transition-all backdrop-blur-sm">
-              <FileText className="w-8 h-8 text-purple-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Upload Documents</h3>
-              <p className="text-sm text-slate-400">
-                Drop your study PDFs and get instant summaries with key topics
-              </p>
-            </div>
-            
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-purple-500/50 transition-all backdrop-blur-sm">
-              <Sparkles className="w-8 h-8 text-purple-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Practice Materials</h3>
-              <p className="text-sm text-slate-400">
-                Auto-generated flashcards, quizzes, and practice tests
-              </p>
-            </div>
-            
-            <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-purple-500/50 transition-all backdrop-blur-sm">
-              <GraduationCap className="w-8 h-8 text-purple-400 mb-4" />
-              <h3 className="font-semibold mb-2 text-white">Interactive Tutoring</h3>
-              <p className="text-sm text-slate-400">
-                Ask questions and get detailed explanations with examples
-              </p>
-            </div>
+            {features.map((f, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md
+                           hover:bg-white/10 hover:border-white/20 transition-all"
+              >
+                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4",
+                                   `bg-gradient-to-br ${gradient} text-white`)}>
+                  {f.icon}
+                </div>
+                <h3 className="font-bold text-lg mb-1">{f.title}</h3>
+                <p className="text-sm text-gray-400">{f.desc}</p>
+              </div>
+            ))}
           </div>
 
           <div className="text-center pt-8">
-            <Button size="lg" onClick={onStart} className="h-14 px-8 text-lg bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 transition-all hover:scale-105">
-              <GraduationCap className="w-5 h-5 mr-2" />
-              Start Learning
+            <Button
+              size="lg"
+              onClick={onStart}
+              className={cn(
+                "h-16 px-10 text-lg font-semibold shadow-2xl",
+                `bg-gradient-to-r ${gradient} hover:scale-105 transition-all`,
+                "border border-white/20"
+              )}
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              {cta}
             </Button>
           </div>
         </div>
