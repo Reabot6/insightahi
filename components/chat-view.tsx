@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
-import { Send, Loader2, Paperclip, FileText, Sparkles, Plus, Menu, ArrowDown } from 'lucide-react'
+import { Send, Loader2, Paperclip, Sparkles, Plus, Menu, ArrowDown, Upload, FileText } from 'lucide-react'
 import type { Conversation, Message } from './chat-interface'
 import MessageBubble from './message-bubble'
 import { cn } from '@/lib/utils'
@@ -49,10 +49,31 @@ export default function ChatView({
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const dropzoneRef = useRef<HTMLDivElement>(null)
+
+  const modeConfig = {
+    dev: {
+      gradient: 'from-cyan-400 to-blue-600',
+      hoverGradient: 'from-cyan-500 to-blue-700',
+      glow: 'shadow-cyan-500/30',
+      border: 'border-cyan-500/30',
+      text: 'text-cyan-400',
+      bg: 'bg-cyan-500/10',
+    },
+    user: {
+      gradient: 'from-purple-400 to-pink-600',
+      hoverGradient: 'from-purple-500 to-pink-700',
+      glow: 'shadow-purple-500/30',
+      border: 'border-purple-500/30',
+      text: 'text-purple-400',
+      bg: 'bg-purple-500/10',
+    }
+  }[mode]
 
   const scrollToBottom = (smooth = true) => {
     messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' })
@@ -68,7 +89,7 @@ export default function ChatView({
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 150
       setShowScrollButton(!isNearBottom && scrollHeight > clientHeight)
     }
 
@@ -83,8 +104,41 @@ export default function ChatView({
     }
   }, [input])
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  // File Dropzone
+  useEffect(() => {
+    const dropzone = dropzoneRef.current
+    if (!dropzone) return
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault()
+      setIsDragging(true)
+    }
+
+    const handleDragLeave = () => {
+      setIsDragging(false)
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      setIsDragging(false)
+      const file = e.dataTransfer?.files[0]
+      if (file) {
+        handleFile(file)
+      }
+    }
+
+    dropzone.addEventListener('dragover', handleDragOver)
+    dropzone.addEventListener('dragleave', handleDragLeave)
+    dropzone.addEventListener('drop', handleDrop)
+
+    return () => {
+      dropzone.removeEventListener('dragover', handleDragOver)
+      dropzone.removeEventListener('dragleave', handleDragLeave)
+      dropzone.removeEventListener('drop', handleDrop)
+    }
+  }, [conversation])
+
+  const handleFile = async (file: File) => {
     if (!file || !conversation) return
 
     setIsLoading(true)
@@ -115,7 +169,7 @@ export default function ChatView({
           const title = file.name.length > 30 ? file.name.slice(0, 30) + '...' : file.name
           onUpdateConversation(conversation.id, { title })
         }
-        
+
         handleRegenerateFromMessage(updatedMessages)
       }
     } catch (error) {
@@ -125,9 +179,14 @@ export default function ChatView({
     }
   }
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleFile(file)
+  }
+
   const handleEditMessage = (messageId: string, newContent: string) => {
     if (!conversation) return
-    
+
     const messageIndex = conversation.messages.findIndex(m => m.id === messageId)
     if (messageIndex === -1) return
 
@@ -277,44 +336,59 @@ export default function ChatView({
   }
 
   const densityStyles = {
-    compact: 'space-y-3',
-    comfortable: 'space-y-6',
-    spacious: 'space-y-8',
+    compact: 'space-y-4',
+    comfortable: 'space-y-7',
+    spacious: 'space-y-10',
   }
 
-  const brandColor = mode === 'dev' ? 'blue' : 'purple'
-
+  // Empty State
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col bg-slate-950">
+      <div className="flex-1 flex flex-col bg-black">
         {onToggleSidebar && (
-          <div className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-xl px-4 py-3">
+          <div className="border-b border-white/10 bg-white/5 backdrop-blur-xl px-5 py-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggleSidebar}
-              className="rounded-xl hover:bg-slate-800/80 transition-all hover:scale-105"
+              className="rounded-xl bg-white/10 hover:bg-white/20 hover:scale-110 transition-all"
             >
               <Menu className="w-5 h-5" />
             </Button>
           </div>
         )}
-        <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-950 to-slate-950">
-          <div className="text-center space-y-8 max-w-md px-4">
-            <div className="relative mx-auto w-28 h-28">
-              <div className={`absolute inset-0 bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 rounded-3xl opacity-20 blur-3xl animate-pulse`}></div>
-              <div className={`relative w-28 h-28 rounded-3xl bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 flex items-center justify-center shadow-2xl shadow-${brandColor}-500/30`}>
-                <span className="text-white font-bold text-5xl">R</span>
+        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5" />
+          <div className="text-center space-y-10 max-w-2xl px-6 z-10">
+            <div className="relative mx-auto w-32 h-32">
+              <div className={cn(
+                "absolute inset-0 rounded-3xl blur-3xl opacity-30 animate-pulse",
+                `bg-gradient-to-br ${modeConfig.gradient}`
+              )} style={{ animationDuration: '4s' }}></div>
+              <div className={cn(
+                "relative w-32 h-32 rounded-3xl flex items-center justify-center",
+                `bg-gradient-to-br ${modeConfig.gradient} shadow-2xl`,
+                modeConfig.glow
+              )}>
+                <span className="text-white font-black text-6xl">I</span>
               </div>
             </div>
             <div className="space-y-4">
-              <h2 className="text-4xl font-bold tracking-tight text-white">Ready to Explore</h2>
-              <p className="text-slate-400 leading-relaxed">
+              <h2 className="text-5xl font-black tracking-tight text-white">Ready to Explore</h2>
+              <p className="text-xl text-gray-400 leading-relaxed">
                 Start a conversation to analyze docs, PDFs, or get AI-powered insights
               </p>
             </div>
-            <Button onClick={onNewConversation} size="lg" className={`rounded-xl shadow-lg bg-gradient-to-r from-${brandColor}-500 to-${brandColor}-600 hover:from-${brandColor}-600 hover:to-${brandColor}-700 transition-all hover:scale-105`}>
-              <Plus className="w-5 h-5 mr-2" />
+            <Button 
+              onClick={onNewConversation} 
+              size="lg" 
+              className={cn(
+                "h-16 px-8 text-lg font-bold rounded-xl shadow-2xl",
+                `bg-gradient-to-r ${modeConfig.gradient} hover:bg-gradient-to-r ${modeConfig.hoverGradient}`,
+                "hover:scale-105 transition-all"
+              )}
+            >
+              <Sparkles className="w-6 h-6 mr-3" />
               Start New Chat
             </Button>
           </div>
@@ -324,81 +398,121 @@ export default function ChatView({
   }
 
   return (
-    <div className="flex-1 flex flex-col relative bg-slate-950">
+    <div className="flex-1 flex flex-col relative bg-black" ref={dropzoneRef}>
+      {/* Header */}
       {onToggleSidebar && sidebarWidth === 0 && (
-        <div className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-xl px-4 py-3 flex items-center gap-3">
+        <div className="border-b border-white/10 bg-white/5 backdrop-blur-xl px-5 py-4 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleSidebar}
-            className="rounded-xl hover:bg-slate-800/80 transition-all hover:scale-105"
+            className="rounded-xl bg-white/10 hover:bg-white/20 hover:scale-110 transition-all"
           >
             <Menu className="w-5 h-5" />
           </Button>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate text-white">{conversation?.title || 'ReadRover'}</h3>
+            <h3 className="font-bold text-lg truncate text-white">{conversation.title}</h3>
           </div>
         </div>
       )}
 
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto bg-slate-950">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          {conversation && conversation.messages.length === 0 ? (
-            <div className="text-center space-y-10 py-16">
-              <div className="relative mx-auto w-28 h-28">
-                <div className={`absolute inset-0 bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 rounded-3xl opacity-20 blur-3xl animate-pulse`}></div>
-                <div className={`relative w-28 h-28 rounded-3xl bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 flex items-center justify-center shadow-2xl shadow-${brandColor}-500/30`}>
-                  <span className="text-white font-bold text-5xl">R</span>
+      {/* Messages */}
+      <div 
+        ref={messagesContainerRef} 
+        className="flex-1 overflow-y-auto px-6 py-8 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+      >
+        <div className="max-w-4xl mx-auto">
+          {conversation.messages.length === 0 ? (
+            <div className="text-center space-y-12 py-20">
+              <div className="relative mx-auto w-32 h-32">
+                <div className={cn(
+                  "absolute inset-0 rounded-3xl blur-3xl opacity-30 animate-pulse",
+                  `bg-gradient-to-br ${modeConfig.gradient}`
+                )} style={{ animationDuration: '4s' }}></div>
+                <div className={cn(
+                  "relative w-32 h-32 rounded-3xl flex items-center justify-center",
+                  `bg-gradient-to-br ${modeConfig.gradient} shadow-2xl`,
+                  modeConfig.glow
+                )}>
+                  <span className="text-white font-black text-6xl">I</span>
                 </div>
               </div>
-              <div className="space-y-4">
-                <h2 className="text-4xl font-bold tracking-tight text-white">How can I help you today?</h2>
-                <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+              <div className="space-y-5">
+                <h2 className="text-4xl font-black tracking-tight text-white">How can I help you today?</h2>
+                <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
                   {mode === 'dev' 
                     ? 'Paste a documentation URL, upload a PDF, or ask about any framework' 
                     : 'Upload study materials or paste content to get summaries and quizzes'}
                 </p>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
                 {SUGGESTED_PROMPTS[mode].map((prompt, i) => (
                   <button
                     key={i}
                     onClick={() => handleSubmitPrompt(prompt)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:text-white transition-all hover:scale-105 hover:shadow-lg"
+                    className={cn(
+                      "px-5 py-3 rounded-xl text-sm font-medium transition-all",
+                      "bg-white/5 border border-white/10 backdrop-blur-xl",
+                      "hover:bg-white/10 hover:border-white/20 hover:scale-105 hover:shadow-lg"
+                    )}
                   >
                     {prompt}
                   </button>
                 ))}
               </div>
+
+              <div className={cn(
+                "mt-12 p-8 rounded-3xl border-2 border-dashed backdrop-blur-xl",
+                isDragging ? modeConfig.border : "border-white/10",
+                isDragging ? modeConfig.bg : "bg-white/5"
+              )}>
+                <Upload className={cn("w-12 h-12 mx-auto mb-4", isDragging ? modeConfig.text : "text-gray-500")} />
+                <p className="text-sm text-gray-400">
+                  {isDragging ? "Drop your file here" : "Drag & drop PDF or image here"}
+                </p>
+              </div>
             </div>
-          ) : conversation && conversation.messages.length > 0 ? (
-            <div className={densityStyles[settings.density]}>
-              {conversation.messages.map((message) => (
-                <MessageBubble 
-                  key={message.id} 
-                  message={message} 
-                  onEdit={handleEditMessage}
-                  mode={mode}
-                  ttsVoice={settings.ttsVoice}
-                />
+          ) : (
+            <div className={cn("space-y-6", densityStyles[settings.density])}>
+              {conversation.messages.map((message, i) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "animate-in fade-in slide-in-from-bottom-4 duration-500",
+                    i === conversation.messages.length - 1 && "scroll-mt-32"
+                  )}
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
+                  <MessageBubble 
+                    message={message} 
+                    onEdit={handleEditMessage}
+                    mode={mode}
+                    ttsVoice={settings.ttsVoice}
+                  />
+                </div>
               ))}
             </div>
-          ) : null}
+          )}
 
+          {/* Loading */}
           {isLoading && (
-            <div className="flex items-start gap-4 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-${brandColor}-500/30`}>
-                <span className="text-white font-bold text-lg">R</span>
+            <div className="flex items-start gap-4 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className={cn(
+                "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
+                `bg-gradient-to-br ${modeConfig.gradient} shadow-lg`,
+                modeConfig.glow
+              )}>
+                <span className="text-white font-black text-xl">I</span>
               </div>
-              <div className="flex-1 rounded-2xl px-5 py-4 bg-slate-800/30 backdrop-blur-sm border border-slate-700/50">
+              <div className="flex-1 rounded-2xl px-6 py-4 bg-white/5 backdrop-blur-xl border border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="flex gap-2">
+                    <div className={cn("w-2 h-2 rounded-full animate-bounce", modeConfig.text)} style={{ animationDelay: '0ms' }}></div>
+                    <div className={cn("w-2 h-2 rounded-full animate-bounce", modeConfig.text)} style={{ animationDelay: '150ms' }}></div>
+                    <div className={cn("w-2 h-2 rounded-full animate-bounce", modeConfig.text)} style={{ animationDelay: '300ms' }}></div>
                   </div>
-                  <span className="text-sm text-slate-400">AI is thinking...</span>
+                  <span className="text-sm text-gray-400">AI is thinking...</span>
                 </div>
               </div>
             </div>
@@ -408,32 +522,41 @@ export default function ChatView({
         </div>
       </div>
 
+      {/* Scroll to Bottom */}
       {showScrollButton && (
         <Button
           size="icon"
-          className={`absolute right-6 bottom-32 rounded-full shadow-2xl bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 hover:from-${brandColor}-600 hover:to-${brandColor}-700 transition-all hover:scale-110 animate-in fade-in zoom-in duration-300`}
+          className={cn(
+            "absolute right-6 bottom-32 rounded-full shadow-2xl",
+            `bg-gradient-to-br ${modeConfig.gradient} hover:scale-110 transition-all`,
+            "animate-in fade-in zoom-in duration-300"
+          )}
           onClick={() => scrollToBottom()}
         >
           <ArrowDown className="w-5 h-5" />
         </Button>
       )}
 
-      <div className="border-t border-slate-800/50 bg-slate-900/50 backdrop-blur-xl">
+      {/* Input */}
+      <div className="border-t border-white/10 bg-white/5 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-5">
           <form onSubmit={handleSubmit} className="relative">
             <div className={cn(
-              "flex items-end gap-3 rounded-2xl border-2 transition-all bg-slate-800/50 p-3 shadow-xl",
-              "border-slate-700 hover:border-slate-600 focus-within:border-blue-500 focus-within:shadow-2xl focus-within:shadow-blue-500/20"
+              "flex items-end gap-3 rounded-2xl border-2 transition-all p-4 shadow-2xl",
+              "bg-white/5 backdrop-blur-xl",
+              "border-white/10 hover:border-white/20",
+              "focus-within:border-white/30 focus-within:shadow-xl"
             )}>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="flex-shrink-0 rounded-xl hover:bg-slate-700/50 transition-all hover:scale-105"
+                className="flex-shrink-0 rounded-xl bg-white/10 hover:bg-white/20 hover:scale-110 transition-all"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Plus className="w-5 h-5" />
+                <Paperclip className="w-5 h-5" />
               </Button>
+
               <Textarea
                 ref={textareaRef}
                 placeholder={mode === 'dev' ? "Ask about docs, paste a URL, or upload a file..." : "Upload content or ask a question..."}
@@ -446,19 +569,25 @@ export default function ChatView({
                   }
                 }}
                 disabled={isLoading}
-                className="flex-1 min-h-[28px] max-h-[180px] resize-none border-0 bg-transparent focus-visible:ring-0 shadow-none text-base px-0 text-white placeholder:text-slate-500 whitespace-pre-wrap break-words"
+                className="flex-1 min-h-[28px] max-h-[180px] resize-none border-0 bg-transparent focus-visible:ring-0 shadow-none text-base px-0 text-white placeholder:text-gray-500 whitespace-pre-wrap break-words"
                 rows={1}
               />
+
               <Button
                 type="submit"
                 size="icon"
                 disabled={!input.trim() || isLoading}
-                className={`flex-shrink-0 rounded-xl h-11 w-11 shadow-lg bg-gradient-to-br from-${brandColor}-500 to-${brandColor}-600 hover:from-${brandColor}-600 hover:to-${brandColor}-700 transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100`}
+                className={cn(
+                  "flex-shrink-0 rounded-xl h-12 w-12 shadow-lg",
+                  `bg-gradient-to-br ${modeConfig.gradient} hover:bg-gradient-to-br ${modeConfig.hoverGradient}`,
+                  "hover:scale-110 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                )}
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
               </Button>
             </div>
           </form>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -466,8 +595,9 @@ export default function ChatView({
             onChange={handleFileUpload}
             className="hidden"
           />
-          <p className="text-xs text-slate-500 text-center mt-3">
-            Press <kbd className="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700">Enter</kbd> to send • <kbd className="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700">Shift + Enter</kbd> for new line
+
+          <p className="text-xs text-gray-500 text-center mt-3">
+            Press <kbd className="px-2 py-1 rounded-md bg-white/10 text-gray-300 text-xs font-mono border border-white/20">Enter</kbd> to send • <kbd className="px-2 py-1 rounded-md bg-white/10 text-gray-300 text-xs font-mono border border-white/20">Shift + Enter</kbd> for new line
           </p>
         </div>
       </div>

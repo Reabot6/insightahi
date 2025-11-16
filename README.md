@@ -249,7 +249,7 @@ insightai/
 
 ## Contributing
 
-i welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
 
@@ -261,4 +261,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 © 2025 Reabot6. All rights reserved.
 
-[Website](https://insightai.vercel.app) • [x](https://X.com/reabot6) • [linkedin](https://www.linkedin.com/in/onimisi-adeiza-bb2035254/)
+[Website](https://insightai.app) • [Twitter](https://twitter.com/insightai) • [Discord](https://discord.gg/insightai)
